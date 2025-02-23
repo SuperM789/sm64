@@ -44,13 +44,12 @@ void bhv_mr_i_particle_loop(void) {
 
 void spawn_mr_i_particle(void) {
     struct Object *particle;
-    f32 mr_i_size = o->header.gfx.scale[1];
+    f32 sp18 = o->header.gfx.scale[1];
 
-    // sets particle spawn point to 50u above Mr I and 90u forwards
     particle = spawn_object(o, MODEL_PURPLE_MARBLE, bhvMrIParticle);
-    particle->oPosY += 50.0f * mr_i_size;
-    particle->oPosX += sins(o->oMoveAngleYaw) * 90.0f * mr_i_size;
-    particle->oPosZ += coss(o->oMoveAngleYaw) * 90.0f * mr_i_size;
+    particle->oPosY += 50.0f * sp18;
+    particle->oPosX += sins(o->oMoveAngleYaw) * 90.0f * sp18;
+    particle->oPosZ += coss(o->oMoveAngleYaw) * 90.0f * sp18;
 
     cur_obj_play_sound_2(SOUND_OBJ_MRI_SHOOT);
 }
@@ -72,7 +71,7 @@ void bhv_mr_i_body_loop(void) {
     } else {
         o->oAnimState++;
         if (o->oAnimState == 15) {
-            o->parentObj->oMrITurnDirection = 0;
+            o->parentObj->oMrIUnk110 = 0;
         }
     }
 
@@ -81,59 +80,58 @@ void bhv_mr_i_body_loop(void) {
     }
 }
 
-// death action
 void mr_i_act_3(void) {
-    s16 move_angle_yaw;
-    s16 turn_direction_factor;
-    f32 scale_factor;
-    f32 turning_speed;
+    s16 sp36;
+    s16 sp34;
+    f32 sp30;
+    f32 sp2C;
     UNUSED u8 filler[8];
-    f32 scale;
-    f32 big_mr_i_factor;
+    f32 sp20;
+    f32 sp1C;
 
     if (o->oBhvParams2ndByte != 0) {
-        big_mr_i_factor = 2.0f;
+        sp1C = 2.0f;
     } else {
-        big_mr_i_factor = 1.0f;
+        sp1C = 1.0f;
     }
 
-    if (o->oMrITurnDirection < 0) {
-        turn_direction_factor = 0x1000;
+    if (o->oMrIUnk100 < 0) {
+        sp34 = 0x1000;
     } else {
-        turn_direction_factor = -0x1000;
+        sp34 = -0x1000;
     }
 
-    turning_speed = (o->oTimer + 1) / 96.0f;
+    sp2C = (o->oTimer + 1) / 96.0f;
 
     if (o->oTimer < 64) {
-        move_angle_yaw = o->oMoveAngleYaw;
-        o->oMoveAngleYaw += turn_direction_factor * coss(0x4000 * turning_speed);
+        sp36 = o->oMoveAngleYaw;
+        o->oMoveAngleYaw += sp34 * coss(0x4000 * sp2C);
 
-        if (move_angle_yaw < 0 && o->oMoveAngleYaw >= 0) {
+        if (sp36 < 0 && o->oMoveAngleYaw >= 0) {
             cur_obj_play_sound_2(SOUND_OBJ2_MRI_SPINNING);
         }
 
-        o->oMoveAnglePitch = (1.0 - coss(0x4000 * turning_speed)) * -0x4000;
+        o->oMoveAnglePitch = (1.0 - coss(0x4000 * sp2C)) * -0x4000;
         cur_obj_shake_y(4.0f);
     } else if (o->oTimer < 96) {
         if (o->oTimer == 64) {
             cur_obj_play_sound_2(SOUND_OBJ_MRI_DEATH);
         }
 
-        scale_factor = (f32)(o->oTimer - 63) / 32;
-        o->oMoveAngleYaw += turn_direction_factor * coss(0x4000 * turning_speed);
-        o->oMoveAnglePitch = (1.0 - coss(0x4000 * turning_speed)) * -0x4000;
+        sp30 = (f32)(o->oTimer - 63) / 32;
+        o->oMoveAngleYaw += sp34 * coss(0x4000 * sp2C);
+        o->oMoveAnglePitch = (1.0 - coss(0x4000 * sp2C)) * -0x4000;
 
-        cur_obj_shake_y((s32)((1.0f - scale_factor) * 4)); // trucating the f32?
-        scale = coss(0x4000 * scale_factor) * 0.4 + 0.6;
-        cur_obj_scale(scale * big_mr_i_factor);
+        cur_obj_shake_y((s32)((1.0f - sp30) * 4)); // trucating the f32?
+        sp20 = coss(0x4000 * sp30) * 0.4 + 0.6;
+        cur_obj_scale(sp20 * sp1C);
     } else if (o->oTimer < 104) {
         // do nothing
     } else if (o->oTimer < 168) {
         if (o->oTimer == 104) {
             cur_obj_become_intangible();
             spawn_mist_particles();
-            o->oMrIScale = big_mr_i_factor * 0.6;
+            o->oMrIScale = sp1C * 0.6;
             if (o->oBhvParams2ndByte != 0) {
                 o->oPosY += 100.0f;
                 spawn_default_star(1370, 2000.0f, -320.0f);
@@ -143,7 +141,7 @@ void mr_i_act_3(void) {
             }
         }
 
-        o->oMrIScale -= 0.2 * big_mr_i_factor;
+        o->oMrIScale -= 0.2 * sp1C;
 
         if (o->oMrIScale < 0) {
             o->oMrIScale = 0;
@@ -155,74 +153,73 @@ void mr_i_act_3(void) {
     }
 }
 
-// locked onto Mario action
 void mr_i_act_2(void) {
-    s16 move_angle_yaw = o->oMoveAngleYaw;
-    s16 move_angle_delta;
+    s16 sp1E = o->oMoveAngleYaw;
+    s16 sp1C;
 
     if (o->oTimer == 0) {
         if (o->oBhvParams2ndByte != 0) {
-            o->oMrITurnCountdown = 200;
+            o->oMrIUnkF4 = 200;
         } else {
-            o->oMrITurnCountdown = 120;
+            o->oMrIUnkF4 = 120;
         }
-        o->oMrITurnDistance = 0;
-        o->oMrITurnDirection = 0;
-        o->oMrIShotTimer = 0;
+        o->oMrIUnkFC = 0;
+        o->oMrIUnk100 = 0;
+        o->oMrIUnk104 = 0;
     }
 
-    obj_turn_toward_object(o, gMarioObject, O_MOVE_ANGLE_YAW_INDEX, 0x800);
-    obj_turn_toward_object(o, gMarioObject, O_MOVE_ANGLE_PITCH_INDEX, 0x400);
+    obj_turn_toward_object(o, gMarioObject, 0x10, 0x800);
+    obj_turn_toward_object(o, gMarioObject, 0x0F, 0x400);
 
-    move_angle_delta = move_angle_yaw - (s16)(o->oMoveAngleYaw);
+    sp1C = sp1E - (s16)(o->oMoveAngleYaw);
 
-    if (move_angle_delta == 0) {
-        o->oMrITurnDistance = 0;
-        o->oMrITurnDirection = 0;
-    } else if (move_angle_delta > 0) {
-        if (o->oMrITurnDirection > 0) {
-            o->oMrITurnDistance += move_angle_delta;
+    if (sp1C == 0) {
+        o->oMrIUnkFC = 0;
+        o->oMrIUnk100 = 0;
+    } else if (sp1C > 0) {
+        if (o->oMrIUnk100 > 0) {
+            o->oMrIUnkFC += sp1C;
         } else {
-            o->oMrITurnDistance = 0;
+            o->oMrIUnkFC = 0;
         }
-        o->oMrITurnDirection = 1;
+        o->oMrIUnk100 = 1;
     } else {
-        if (o->oMrITurnDirection < 0) {
-            o->oMrITurnDistance -= move_angle_delta;
+        if (o->oMrIUnk100 < 0) {
+            o->oMrIUnkFC -= sp1C;
         } else {
-            o->oMrITurnDistance = 0;
+            o->oMrIUnkFC = 0;
         }
-        o->oMrITurnDirection = -1;
+        o->oMrIUnk100 = -1;
     }
 
-    if (o->oMrITurnDistance == 0) {
-        o->oMrITurnCountdown = 120;
+    if (o->oMrIUnkFC == 0) {
+        o->oMrIUnkF4 = 120;
     }
-    if (o->oMrITurnDistance > 65536) {
+    if (o->oMrIUnkFC > 65536) {
         o->oAction = 3;
     }
 
-    o->oMrITurnCountdown--;
+    o->oMrIUnkF4--;
 
-    if (o->oMrITurnCountdown == 0) {
-        o->oMrITurnCountdown = 120;
-        o->oMrITurnDistance = 0;
+    if (o->oMrIUnkF4 == 0) {
+        o->oMrIUnkF4 = 120;
+        o->oMrIUnkFC = 0;
     }
 
-    if (o->oMrITurnDistance < 5000) {
-        if (o->oMrIShotTimer == o->oMrIShotTimerMax) {
-            o->oMrIBlinking = 1;
+    if (o->oMrIUnkFC < 5000) {
+        if (o->oMrIUnk104 == o->oMrIUnk108) {
+            o->oMrIUnk110 = 1;
         }
 
-        if (o->oMrIShotTimer == o->oMrIShotTimerMax + 20) {
+        if (o->oMrIUnk104 == o->oMrIUnk108 + 20) {
             spawn_mr_i_particle();
-            o->oMrIShotTimer = 0;
-            o->oMrIShotTimerMax = (s32)(random_float() * 50.0f + 50.0f);
+            o->oMrIUnk104 = 0;
+            o->oMrIUnk108 = (s32)(random_float() * 50.0f + 50.0f);
         }
-        o->oMrIShotTimer++;
+        o->oMrIUnk104++;
     } else {
-        o->oMrIShotTimer = 0;
-        o->oMrIShotTimerMax = (s32)(random_float() * 50.0f + 50.0f);
+        o->oMrIUnk104 = 0;
+        o->oMrIUnk108 = (s32)(random_float() * 50.0f + 50.0f);
     }
 
     if (o->oDistanceToMario > 800.0f) {
@@ -230,47 +227,45 @@ void mr_i_act_2(void) {
     }
 }
 
-// casually turning around action
 void mr_i_act_1(void) {
-    s16 angle_to_mario = obj_angle_to_object(o, gMarioObject);
-    s16 angle_to_mario_diff = abs_angle_diff(o->oMoveAngleYaw, angle_to_mario);
-    s16 eye_contact_diff = abs_angle_diff(o->oMoveAngleYaw, gMarioObject->oFaceAngleYaw);
+    s16 sp1E = obj_angle_to_object(o, gMarioObject);
+    s16 sp1C = abs_angle_diff(o->oMoveAngleYaw, sp1E);
+    s16 sp1A = abs_angle_diff(o->oMoveAngleYaw, gMarioObject->oFaceAngleYaw);
 
     if (o->oTimer == 0) {
         cur_obj_become_tangible();
         o->oMoveAnglePitch = 0;
-        o->oMrIShotTimer = 30;
-        o->oMrIShotTimerMax = random_float() * 20.0f;
-        if (o->oMrIShotTimerMax & 1) {
+        o->oMrIUnk104 = 30;
+        o->oMrIUnk108 = random_float() * 20.0f;
+        if (o->oMrIUnk108 & 1) {
             o->oAngleVelYaw = -256;
         } else {
             o->oAngleVelYaw = 256;
         }
     }
 
-    if (angle_to_mario_diff < 1024 && eye_contact_diff > 0x4000) {
+    if (sp1C < 1024 && sp1A > 0x4000) {
         if (o->oDistanceToMario < 700.0f) {
             o->oAction = 2;
         } else {
-            o->oMrIShotTimer++;
+            o->oMrIUnk104++;
         }
     } else {
         o->oMoveAngleYaw += o->oAngleVelYaw;
-        o->oMrIShotTimer = 30;
+        o->oMrIUnk104 = 30;
     }
 
-    if (o->oMrIShotTimer == o->oMrIShotTimerMax + 60) {
+    if (o->oMrIUnk104 == o->oMrIUnk108 + 60) {
         o->oMrIUnk110 = 1;
     }
 
-    if (o->oMrIShotTimer > o->oMrIShotTimerMax + 80) {
-        o->oMrIShotTimer = 0;
-        o->oMrIShotTimerMax = random_float() * 80.0f;
+    if (o->oMrIUnk104 > o->oMrIUnk108 + 80) {
+        o->oMrIUnk104 = 0;
+        o->oMrIUnk108 = random_float() * 80.0f;
         spawn_mr_i_particle();
     }
 }
 
-// Mr I init action
 void mr_i_act_0(void) {
 #ifndef VERSION_JP
     obj_set_angle(o, 0, 0, 0);
