@@ -710,13 +710,13 @@
 #define /*0x1AC*/ oMrBlizzardTargetMoveYaw     OBJECT_FIELD_S32(0x49)
 
 /* Mr. I */
-#define /*0x0F4*/ oMrITurnCountdown  OBJECT_FIELD_S32(0x1B)
-#define /*0x0FC*/ oMrITurnDistance  OBJECT_FIELD_S32(0x1D)
-#define /*0x100*/ oMrITurnDirection OBJECT_FIELD_S32(0x1E)
-#define /*0x104*/ oMrIShotTimer OBJECT_FIELD_S32(0x1F)
-#define /*0x108*/ oMrIShotTimerMax OBJECT_FIELD_S32(0x20)
+#define /*0x0F4*/ oMrIUnkF4  OBJECT_FIELD_S32(0x1B)
+#define /*0x0FC*/ oMrIUnkFC  OBJECT_FIELD_S32(0x1D)
+#define /*0x100*/ oMrIUnk100 OBJECT_FIELD_S32(0x1E)
+#define /*0x104*/ oMrIUnk104 OBJECT_FIELD_S32(0x1F)
+#define /*0x108*/ oMrIUnk108 OBJECT_FIELD_S32(0x20)
 #define /*0x10C*/ oMrIScale  OBJECT_FIELD_F32(0x21)
-#define /*0x110*/ oMrIBlinking OBJECT_FIELD_S32(0x22)
+#define /*0x110*/ oMrIUnk110 OBJECT_FIELD_S32(0x22)
 
 /* Object Respawner */
 #define /*0x0F4*/ oRespawnerModelToRespawn    OBJECT_FIELD_S32(0x1B)
